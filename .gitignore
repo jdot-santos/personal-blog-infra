@@ -35,3 +35,16 @@ override.tf.json
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
+
+
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+# Ignore IntelliJ IDEA files
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+logs/
