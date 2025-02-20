@@ -91,11 +91,11 @@ resource "fastly_service_vcl" "demo" {
     source      = "\"max-age=31536000; includeSubDomains; preload\""
     priority    = 10
   }
-  #   vcl {
-  #     name    = "my_custom_main_vcl"
-  #     content = file("${path.module}/vcl/main.vcl")
-  #     main    = true
-  #   }
+  vcl {
+    name    = "homepage_redirect"
+    content = file("${path.module}/vcl/homepage_redirect.vcl")
+    main    = true
+  }
 
   force_destroy = true
 }
