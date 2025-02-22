@@ -91,11 +91,36 @@ resource "fastly_service_vcl" "demo" {
     source      = "\"max-age=31536000; includeSubDomains; preload\""
     priority    = 10
   }
+
+  # setup redirects
   vcl {
     name    = "homepage_redirect"
     content = file("${path.module}/vcl/homepage_redirect.vcl")
     main    = true
   }
 
-  force_destroy = true
+  # cache objects for a year
+  header {
+    action        = "set"
+    destination   = "http.surrogate-control"
+    name          = "Surrogate-Control"
+    type          = "cache"
+    source        = "\"max-age=31557600\""
+    ignore_if_set = false
+    priority      = 10
+  }
+
+  # tell browser to not cache the object
+  header {
+    action        = "set"
+    destination   = "http.cache-control"
+    name          = "Cache-Control"
+    type          = "cache"
+    source        = "\"no-store,max-age=0\""
+    ignore_if_set = false
+    priority      = 10
+  }
+
+  force_destroy  = true
+  stale_if_error = true
 }
