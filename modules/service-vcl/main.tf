@@ -3,26 +3,27 @@ resource "fastly_service_vcl" "demo" {
   comment = "Managed by Terraform"
 
   domain {
-    name    = "jsantos-demo.global.ssl.fastly.net"
-    comment = "demo"
+    name = var.domain.name
+    comment = var.domain.comment
   }
 
-  backend {
-    address = "jdot-santos.github.io"
-    name    = "My blog hosted by Github Pages"
+ dynamic backend {
+    for_each = var.backends
 
-    # most of these values come default when creating the CDN service using the values above
-    auto_loadbalance      = false
-    ssl_cert_hostname     = "jdot-santos.github.io"
-    ssl_sni_hostname      = "jdot-santos.github.io"
-    weight                = 100
-    use_ssl               = true
-    max_conn              = 200
-    connect_timeout       = 1000
-    first_byte_timeout    = 15000
-    between_bytes_timeout = 10000
-    override_host         = "jdot-santos.github.io"
-    port                  = 443
+    content {
+      name = backend.value["name"]
+      address = backend.value["address"]
+      ssl_cert_hostname = backend.value["ssl_cert_hostname"]
+      ssl_sni_hostname = backend.value["ssl_sni_hostname"]
+      weight = backend.value["weight"]
+      use_ssl = backend.value["use_ssl"]
+      max_conn = backend.value["max_conn"]
+      connect_timeout = backend.value["connect_timeout"]
+      first_byte_timeout = backend.value["first_byte_timeout"]
+      between_bytes_timeout = backend.value["between_bytes_timeout"]
+      override_host = backend.value["override_host"]
+      port = backend.value["port"]
+    }
   }
 
   condition {
@@ -48,37 +49,8 @@ resource "fastly_service_vcl" "demo" {
 
   gzip {
     name = "custom-compression-policy"
-    content_types = [
-      "text/html",
-      "application/x-javascript",
-      "text/css",
-      "application/javascript",
-      "text/javascript",
-      "application/json",
-      "application/vnd.ms-fontobject",
-      "application/x-font-opentype",
-      "application/x-font-truetype",
-      "application/x-font-ttf",
-      "application/xml",
-      "font/eot",
-      "font/opentype",
-      "font/otf",
-      "image/svg+xml",
-      "image/vnd.microsoft.icon",
-      "text/plain",
-      "text/xml"
-    ]
-    extensions = [
-      "css",
-      "js",
-      "html",
-      "eot",
-      "ico",
-      "otf",
-      "ttf",
-      "json",
-      "svg"
-    ]
+    content_types = var.gzip_content_types
+    extensions = var.gzip_extensions
     cache_condition = "status_200_or_404"
   }
 
