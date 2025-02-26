@@ -1,6 +1,8 @@
-resource "fastly_service_vcl" "demo" {
-  name    = "demofastly"
-  comment = "Managed by Terraform"
+resource "fastly_service_vcl" "service" {
+  name    = var.service_vcl.name
+  comment = var.service_vcl.comment
+  force_destroy  = var.service_vcl.force_destroy
+  stale_if_error = var.service_vcl.stale_if_error
 
   domain {
     name = var.domain.name
@@ -92,7 +94,4 @@ resource "fastly_service_vcl" "demo" {
     ignore_if_set = false
     priority      = 10
   }
-
-  force_destroy  = true
-  stale_if_error = true
 }

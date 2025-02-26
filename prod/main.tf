@@ -4,4 +4,5 @@ module "vcl" {
   gzip_content_types = var.gzip_content_types
   domain             = var.domain
   backends           = var.backends
+  service_vcl = var.service_vcl
 }

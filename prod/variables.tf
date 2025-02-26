@@ -31,3 +31,12 @@ variable "backends" {
     port                  = number
   }))
 }
+
+variable "service_vcl" {
+  type = object({
+    name    = string
+    comment = string
+    force_destroy = bool
+    stale_if_error = bool
+  })
+}
