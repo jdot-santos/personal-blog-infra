@@ -11,12 +11,11 @@ variable "gzip_content_types" {
   type = list(string)
 }
 
-variable "domain" {
-  description = "Domain configuration"
-  type = object({
+variable "domains" {
+  type = list(object({
     name    = string
     comment = string
-  })
+  }))
 }
 
 variable "backends" {
@@ -43,5 +42,13 @@ variable "service_vcl" {
     comment        = string
     force_destroy  = bool
     stale_if_error = bool
+  })
+}
+
+variable "tls_subscription" {
+  type = object({
+    id = string
+    certificate_authority = string
+    common_name = string
   })
 }

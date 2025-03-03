@@ -18,9 +18,13 @@ resource "fastly_service_vcl" "service" {
   force_destroy  = var.service_vcl.force_destroy
   stale_if_error = var.service_vcl.stale_if_error
 
-  domain {
-    name    = var.domain.name
-    comment = var.domain.comment
+  dynamic "domain" {
+    for_each = var.domains
+
+    content {
+      name = domain.value["name"]
+      comment = domain.value["comment"]
+    }
   }
 
   dynamic "backend" {
@@ -85,6 +89,12 @@ resource "fastly_service_vcl" "service" {
     name    = "homepage_redirect"
     content = file("${path.module}/vcl/homepage_redirect.vcl")
     main    = true
+  }
+
+  # setup redirects
+  vcl {
+    name    = "add_www_to_apex_subdomains"
+    content = file("${path.module}/vcl/add_www_to_apex_subdomains.vcl")
   }
 
   # cache objects for a year
