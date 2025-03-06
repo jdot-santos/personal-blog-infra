@@ -1,17 +1,3 @@
-data "fastly_services" "services" {}
-
-output "fastly_services_all" {
-  value = data.fastly_services.services
-}
-
-output "fastly_services_filtered" {
-  value = one([for service in data.fastly_services.services.details : service.id if service.name == "My Test Service"])
-}
-
-output "fastly_services_version" {
-  value = one([for service in data.fastly_services.services.details : service.version if service.name == "My Test Service"])
-}
-
 resource "fastly_service_vcl" "service" {
   name           = var.service_vcl.name
   comment        = var.service_vcl.comment
@@ -22,7 +8,7 @@ resource "fastly_service_vcl" "service" {
     for_each = var.domains
 
     content {
-      name = domain.value["name"]
+      name    = domain.value["name"]
       comment = domain.value["comment"]
     }
   }
@@ -31,18 +17,18 @@ resource "fastly_service_vcl" "service" {
     for_each = var.backends
 
     content {
-      name                  = backend.value["name"]
-      address               = backend.value["address"]
-      ssl_cert_hostname     = backend.value["ssl_cert_hostname"]
-      ssl_sni_hostname      = backend.value["ssl_sni_hostname"]
-      weight                = backend.value["weight"]
-      use_ssl               = backend.value["use_ssl"]
-      max_conn              = backend.value["max_conn"]
-      connect_timeout       = backend.value["connect_timeout"]
-      first_byte_timeout    = backend.value["first_byte_timeout"]
-      between_bytes_timeout = backend.value["between_bytes_timeout"]
-      override_host         = backend.value["override_host"]
-      port                  = backend.value["port"]
+      name                  = backend.value.name
+      address               = backend.value.address
+      ssl_cert_hostname     = backend.value.auto_loadbalance
+      ssl_sni_hostname      = backend.value.ssl_sni_hostname
+      weight                = backend.value.weight
+      use_ssl               = backend.value.use_ssl
+      max_conn              = backend.value.max_conn
+      connect_timeout       = backend.value.connect_timeout
+      first_byte_timeout    = backend.value.first_byte_timeout
+      between_bytes_timeout = backend.value.between_bytes_timeout
+      override_host         = backend.value.override_host
+      port                  = backend.value.port
     }
   }
 
@@ -74,14 +60,17 @@ resource "fastly_service_vcl" "service" {
     cache_condition = "status_200_or_404"
   }
 
-  # Header to enable HSTS
-  header {
-    name        = "Enable HSTS"
-    action      = "set"
-    destination = "http.Strict-Transport-Security"
-    type        = "response"
-    source      = "\"max-age=31536000; includeSubDomains; preload\""
-    priority    = 10
+  dynamic "header" {
+    for_each = var.headers
+    content {
+      name          = header.value.name
+      type          = header.value.type
+      action        = header.value.action
+      destination   = header.value.destination
+      source        = header.value.source
+      ignore_if_set = header.value.ignore_if_set
+      priority      = header.value.priority
+    }
   }
 
   # setup redirects
@@ -91,31 +80,11 @@ resource "fastly_service_vcl" "service" {
     main    = true
   }
 
-  # setup redirects
+  # add www to apex and subdomains
   vcl {
     name    = "add_www_to_apex_subdomains"
     content = file("${path.module}/vcl/add_www_to_apex_subdomains.vcl")
   }
-
-  # cache objects for a year
-  header {
-    action        = "set"
-    destination   = "http.surrogate-control"
-    name          = "Surrogate-Control"
-    type          = "cache"
-    source        = "\"max-age=31557600\""
-    ignore_if_set = false
-    priority      = 10
-  }
-
-  # tell browser to not cache the object
-  header {
-    action        = "set"
-    destination   = "http.cache-control"
-    name          = "Cache-Control"
-    type          = "cache"
-    source        = "\"no-store,max-age=0\""
-    ignore_if_set = false
-    priority      = 10
-  }
 }
+
+data "fastly_services" "services" {}

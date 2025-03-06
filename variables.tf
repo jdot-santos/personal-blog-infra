@@ -18,6 +18,18 @@ variable "domains" {
   }))
 }
 
+variable "headers" {
+  type = list(object({
+    name          = string
+    type          = string
+    action        = string
+    destination   = string
+    source        = string
+    ignore_if_set = bool
+    priority      = number
+  }))
+}
+
 variable "backends" {
   type = list(object({
     name                  = string
@@ -47,8 +59,8 @@ variable "service_vcl" {
 
 variable "tls_subscription" {
   type = object({
-    id = string
+    id                    = string
     certificate_authority = string
-    common_name = string
+    common_name           = string
   })
 }
