@@ -16,6 +16,7 @@ variable "domains" {
     name    = string
     comment = string
   }))
+  description = "List of domains"
 }
 
 variable "headers" {
@@ -48,6 +49,14 @@ variable "backends" {
   }))
 }
 
+variable "vcls" {
+  type = list(object({
+    name      = string
+    file_name = string
+    main      = bool
+  }))
+}
+
 variable "service_vcl" {
   type = object({
     name           = string
@@ -57,10 +66,11 @@ variable "service_vcl" {
   })
 }
 
-variable "tls_subscription" {
-  type = object({
-    id                    = string
-    certificate_authority = string
-    common_name           = string
-  })
-}
+# variable "tls_subscription" {
+#   type = object({
+#     id                    = string
+#     certificate_authority = string
+#     common_name           = string
+#   })
+# }
+

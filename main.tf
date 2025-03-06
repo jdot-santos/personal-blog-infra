@@ -19,7 +19,7 @@ resource "fastly_service_vcl" "service" {
     content {
       name                  = backend.value.name
       address               = backend.value.address
-      ssl_cert_hostname     = backend.value.auto_loadbalance
+      ssl_cert_hostname     = backend.value.ssl_cert_hostname
       ssl_sni_hostname      = backend.value.ssl_sni_hostname
       weight                = backend.value.weight
       use_ssl               = backend.value.use_ssl
@@ -29,6 +29,7 @@ resource "fastly_service_vcl" "service" {
       between_bytes_timeout = backend.value.between_bytes_timeout
       override_host         = backend.value.override_host
       port                  = backend.value.port
+      auto_loadbalance      = backend.value.auto_loadbalance
     }
   }
 
@@ -73,17 +74,13 @@ resource "fastly_service_vcl" "service" {
     }
   }
 
-  # setup redirects
-  vcl {
-    name    = "homepage_redirect"
-    content = file("${path.module}/vcl/homepage_redirect.vcl")
-    main    = true
-  }
-
-  # add www to apex and subdomains
-  vcl {
-    name    = "add_www_to_apex_subdomains"
-    content = file("${path.module}/vcl/add_www_to_apex_subdomains.vcl")
+  dynamic "vcl" {
+    for_each = var.vcls
+    content {
+      name    = vcl.value.name
+      content = file("${path.module}/vcl/${vcl.value.file_name}")
+      main    = vcl.value.main
+    }
   }
 }
 
