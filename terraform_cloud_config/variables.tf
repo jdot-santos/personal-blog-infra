@@ -10,11 +10,32 @@ variable "oauth_name" {
 }
 
 variable "organization" {
-  type        = string
   description = "Terraform Cloud organization"
+  type = object({
+    name  = string
+    email = string
+  })
 }
 
 variable "gh_pat" {
   type        = string
   description = "Github Personal Access token"
+}
+
+variable "workspaces" {
+  type = list(object({
+    name                  = string
+    queue_all_runs        = bool
+    file_triggers_enabled = bool
+    auto_apply            = bool
+    vcs_branch_name       = string
+    use_vcs_repo          = bool
+  }))
+}
+
+variable "gh_repo" {
+  type = object({
+    identifier     = string
+    oauth_token_id = string
+  })
 }
