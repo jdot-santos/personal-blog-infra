@@ -1,12 +1,3 @@
-locals {
-  env_to_workspace = {
-    dev      = tfe_workspace.web_blog_dev
-    feature  = tfe_workspace.web_blog_feature
-    staging  = tfe_workspace.web_blog_staging
-    prod     = tfe_workspace.web_blog_prod
-  }
-}
-
 resource "tfe_variable" "env_vars" {
   for_each = var.environments
   key          = "env"
@@ -15,7 +6,7 @@ resource "tfe_variable" "env_vars" {
   description  = "Environment variable for ${each.key}"
   sensitive    = false
   hcl          = false
-  workspace_id = local.env_to_workspace[each.key].id
+  workspace_id = tfe_workspace.workspaces[each.key].id
 }
 
 resource "tfe_variable" "service_vcl_vars" {
@@ -26,7 +17,7 @@ resource "tfe_variable" "service_vcl_vars" {
   description  = "Service VCL for ${each.key}"
   sensitive    = false
   hcl          = true
-  workspace_id = local.env_to_workspace[each.key].id
+  workspace_id = tfe_workspace.workspaces[each.key].id
 }
 
 resource "tfe_variable" "domains_vars" {
@@ -38,7 +29,7 @@ resource "tfe_variable" "domains_vars" {
   description  = "Domains for ${each.key}"
   sensitive    = false
   hcl          = true
-  workspace_id = local.env_to_workspace[each.key].id
+  workspace_id = tfe_workspace.workspaces[each.key].id
 }
 
 resource "tfe_variable" "backends_vars" {
@@ -50,7 +41,7 @@ resource "tfe_variable" "backends_vars" {
   description  = "Backends for ${each.key}"
   sensitive    = false
   hcl          = true
-  workspace_id = local.env_to_workspace[each.key].id
+  workspace_id = tfe_workspace.workspaces[each.key].id
 }
 
 resource "tfe_variable" "headers_vars" {
@@ -62,7 +53,7 @@ resource "tfe_variable" "headers_vars" {
   description  = "Headers for ${each.key}"
   sensitive    = false
   hcl          = true
-  workspace_id = local.env_to_workspace[each.key].id
+  workspace_id = tfe_workspace.workspaces[each.key].id
 }
 
 resource "tfe_variable" "vcls_vars" {
@@ -74,7 +65,7 @@ resource "tfe_variable" "vcls_vars" {
   description  = "VCLs for ${each.key}"
   sensitive    = false
   hcl          = true
-  workspace_id = local.env_to_workspace[each.key].id
+  workspace_id = tfe_workspace.workspaces[each.key].id
 }
 
 resource "tfe_variable" "fastly_api_key_vars" {
@@ -86,5 +77,5 @@ resource "tfe_variable" "fastly_api_key_vars" {
   description  = "Fastly API key for ${each.key}"
   sensitive    = true
   hcl          = false
-  workspace_id = local.env_to_workspace[each.key].id
+  workspace_id = tfe_workspace.workspaces[each.key].id
 }

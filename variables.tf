@@ -96,11 +96,3 @@ variable "service_vcl" {
     stale_if_error = bool
   })
 }
-
-# variable "tls_subscription" {
-#   type = object({
-#     id                    = string
-#     certificate_authority = string
-#     common_name           = string
-#   })
-# }
