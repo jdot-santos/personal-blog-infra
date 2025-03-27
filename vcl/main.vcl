@@ -1,6 +1,9 @@
 table solution_redirects {
     "/": "/personal-blog/",
-    "/personal-blog": "/personal-blog/"
+    "/personal-blog": "/personal-blog/",
+    "/personal-blog/posts": "/personal-blog/posts/",
+    "/personal-blog/contact": "/personal-blog/contact/",
+    "/personal-blog/about": "/personal-blog/about/"
 }
 
 sub vcl_recv {
@@ -101,7 +104,7 @@ sub vcl_error {
       return (deliver);
     }
 
-    # redirect home page or /personal-blog
+    # redirect based on table
     if (obj.status == 620 && obj.response == "redirect") {
       set obj.status = 308;
       set obj.http.Location = "https://" + req.http.host + table.lookup(solution_redirects, req.url.path);
