@@ -42,8 +42,8 @@ variable "gh_repo" {
 
 variable "environments" {
   type = map(object({
-    env             = string
-    service_vcl     = object({
+    env = string
+    service_vcl = object({
       name           = string
       comment        = string
       force_destroy  = bool
@@ -83,5 +83,12 @@ variable "environments" {
       main      = bool
     }))
     fastly_api_key = string
+    grafana_log = object({
+      name     = string
+      token    = string
+      url      = string
+      user     = string
+      app_name = string
+    })
   }))
 }

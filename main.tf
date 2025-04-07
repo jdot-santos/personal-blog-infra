@@ -1,8 +1,9 @@
 resource "fastly_service_vcl" "service" {
-  name           = var.service_vcl.name
-  comment        = var.service_vcl.comment
-  force_destroy  = var.service_vcl.force_destroy
-  stale_if_error = var.service_vcl.stale_if_error
+  name            = var.service_vcl.name
+  version_comment = "Add Grafana Cloud logging"
+  comment         = var.service_vcl.comment
+  force_destroy   = var.service_vcl.force_destroy
+  stale_if_error  = var.service_vcl.stale_if_error
 
   dynamic "domain" {
     for_each = var.domains
@@ -81,6 +82,20 @@ resource "fastly_service_vcl" "service" {
       content = file("${path.module}/vcl/${vcl.value.file_name}")
       main    = vcl.value.main
     }
+  }
+
+  logging_grafanacloudlogs {
+    index = jsonencode(
+      {
+        "app" : var.grafana_log.app_name,
+        "env" : var.env
+      }
+    )
+    name   = var.grafana_log.name
+    token  = var.grafana_log.token
+    url    = var.grafana_log.url
+    user   = var.grafana_log.user
+    format = var.grafana_log_format
   }
 }
 
