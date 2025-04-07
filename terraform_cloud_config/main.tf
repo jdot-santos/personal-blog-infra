@@ -36,7 +36,7 @@ resource "tfe_workspace" "workspaces" {
 }
 
 resource "tfe_variable" "env_vars" {
-  for_each = var.environments
+  for_each     = var.environments
   key          = "env"
   value        = each.value.env
   category     = "terraform"
@@ -47,7 +47,7 @@ resource "tfe_variable" "env_vars" {
 }
 
 resource "tfe_variable" "service_vcl_vars" {
-  for_each = var.environments
+  for_each     = var.environments
   key          = "service_vcl"
   value        = jsonencode(each.value.service_vcl)
   category     = "terraform"
@@ -114,5 +114,17 @@ resource "tfe_variable" "fastly_api_key_vars" {
   description  = "Fastly API key for ${each.key}"
   sensitive    = true
   hcl          = false
+  workspace_id = tfe_workspace.workspaces[each.key].id
+}
+
+resource "tfe_variable" "grafana_log_vars" {
+  for_each = var.environments
+
+  key          = "grafana_log"
+  value        = jsonencode(each.value.grafana_log)
+  category     = "terraform"
+  description  = "Grafana Log for ${each.key}"
+  sensitive    = true
+  hcl          = true
   workspace_id = tfe_workspace.workspaces[each.key].id
 }
