@@ -3,7 +3,8 @@ table solution_redirects {
     "/personal-blog": "/personal-blog/",
     "/personal-blog/posts": "/personal-blog/posts/",
     "/personal-blog/contact": "/personal-blog/contact/",
-    "/personal-blog/about": "/personal-blog/about/"
+    "/personal-blog/about": "/personal-blog/about/",
+    "/sitemap.xml": "/personal-blog/sitemap.xml"
 }
 
 sub vcl_recv {
