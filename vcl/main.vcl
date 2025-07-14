@@ -7,6 +7,10 @@ table solution_redirects {
     "/sitemap.xml": "/personal-blog/sitemap.xml"
 }
 
+table paths_to_block {
+    "/test-block": ""
+}
+
 sub vcl_recv {
 #FASTLY recv
 
@@ -29,6 +33,11 @@ sub vcl_recv {
     if (table.contains(solution_redirects, req.url.path)) {
         error 620 "redirect";
     }
+
+    if (table.contains(paths_to_block, req.url.path)) {
+        error 621 "block";
+    }
+
     return(lookup);
 }
 
@@ -110,6 +119,12 @@ sub vcl_error {
       set obj.status = 308;
       set obj.http.Location = "https://" + req.http.host + table.lookup(solution_redirects, req.url.path);
       return (deliver);
+    }
+
+    if (obj.status == 621 && obj.response == "block") {
+      set obj.status = 403;
+      set obj.response = "Forbidden";
+      return(deliver);
     }
 
     return(deliver);
