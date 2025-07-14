@@ -1,6 +1,6 @@
 resource "fastly_service_vcl" "service" {
   name            = var.service_vcl.name
-  version_comment = "Update redirect table for sitemap.xml"
+  version_comment = "Add logic to block based on path"
   comment         = var.service_vcl.comment
   force_destroy   = var.service_vcl.force_destroy
   stale_if_error  = var.service_vcl.stale_if_error
