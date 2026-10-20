@@ -1,0 +1,2 @@
+terraform_cloud_config/
+*.tfvars.ignore
