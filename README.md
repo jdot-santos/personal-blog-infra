@@ -70,9 +70,11 @@ Notes:
 
 ### Deploying
 
-1. Open a PR from a feature branch into `dev`. GitHub Actions runs `terraform fmt -check` and `terraform validate`.
+1. Open a PR from a feature branch into **`dev`**, never `main`. GitHub defaults new PRs to `main`, so set the base explicitly: `gh pr create --base dev`, or pick `dev` in the web UI. GitHub Actions runs `terraform fmt -check` and `terraform validate`.
 2. Merge. `web_blog_dev` plans and applies automatically.
-3. Promote with PRs `dev` → `staging` (auto-applies) → `production` (confirm the apply in the workspace).
+3. Promote with PRs `dev` → `staging` (auto-applies) → `production` (confirm the apply in the workspace) → `main`.
+
+`main` only receives merges from `production`, so it always matches what's live.
 
 To check for drift without changing anything: open a workspace → **New run** → **Run type: Plan only**.
 

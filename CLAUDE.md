@@ -35,6 +35,7 @@ terraform plan -var-file=inputs.tfvars
 - `terraform_cloud_config/` is the source of truth for workspace settings and variables; never change them in the TFC UI. Before applying it, `terraform plan -var-file=inputs.tfvars -detailed-exitcode` must show `No changes` (exit 0). See `terraform_cloud_config/README.md`.
 - Workspaces: `web_blog_dev`, `web_blog_staging`, `web_blog_production` are VCS-bound to the matching git branch; `web_blog_feature` is CLI-driven (see README for Remote vs Local execution).
 - Promotion is by PR: feature branch → `dev` → `staging` → `production` → `main`. `dev` and `staging` auto-apply; production applies manually.
+- **Every new PR targets `dev`**: always `gh pr create --base dev` (GitHub's default base is `main`). Never open a feature PR against `main`, `staging`, or `production`; those only receive promotion PRs from the previous branch.
 - Local root-module runs use the gitignored `backend_local.tf`, a `cloud {}` block pointed at `web_blog_feature`. Without it, `terraform init` silently uses local state.
 
 ## Editing VCL (`vcl/main.vcl`)
