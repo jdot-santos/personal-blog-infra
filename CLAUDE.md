@@ -32,7 +32,7 @@ terraform plan -var-file=inputs.tfvars
 ## How changes deploy
 
 - Root-module variables have **no tfvars in the repo**. Values per environment live in `terraform_cloud_config` and are pushed into TFC workspaces as variables (`FASTLY_API_KEY` as an env var).
-- **Do not apply `terraform_cloud_config/` as-is.** The workspaces were changed in the UI (GitHub App VCS connection, staging `auto_apply_run_trigger`) and the code was never updated, so an apply reverts them to the old OAuth token. Rotate workspace secrets in the UI and mirror them in `inputs.tfvars`.
+- `terraform_cloud_config/` is the source of truth for workspace settings and variables; never change them in the TFC UI. Before applying it, `terraform plan -var-file=inputs.tfvars -detailed-exitcode` must show `No changes` (exit 0). See `terraform_cloud_config/README.md`.
 - Workspaces: `web_blog_dev`, `web_blog_staging`, `web_blog_production` are VCS-bound to the matching git branch; `web_blog_feature` is CLI-driven (see README for Remote vs Local execution).
 - Promotion is by PR: feature branch → `dev` → `staging` → `production` → `main`. `dev` and `staging` auto-apply; production applies manually.
 - Local root-module runs use the gitignored `backend_local.tf`, a `cloud {}` block pointed at `web_blog_feature`. Without it, `terraform init` silently uses local state.
