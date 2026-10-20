@@ -35,8 +35,8 @@ variable "workspaces" {
 
 variable "gh_repo" {
   type = object({
-    identifier     = string
-    oauth_token_id = string
+    identifier                 = string
+    github_app_installation_id = string
   })
 }
 
