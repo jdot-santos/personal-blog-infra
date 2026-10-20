@@ -28,9 +28,9 @@ resource "tfe_workspace" "workspaces" {
   dynamic "vcs_repo" {
     for_each = each.value.use_vcs_repo ? [1] : []
     content {
-      branch         = each.value.vcs_branch_name
-      identifier     = var.gh_repo.identifier
-      oauth_token_id = var.gh_repo.oauth_token_id
+      branch                     = each.value.vcs_branch_name
+      identifier                 = var.gh_repo.identifier
+      github_app_installation_id = var.gh_repo.github_app_installation_id
     }
   }
 }

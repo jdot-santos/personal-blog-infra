@@ -56,3 +56,4 @@ logs/
 # Ignore local files
 backend_local.tf
 *.tfvars.ignore
+.claude/settings.local.json
