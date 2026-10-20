@@ -26,13 +26,14 @@ Bootstrap module (needs `TFE_TOKEN`; tfvars is local-only and holds secrets):
 ```bash
 cd terraform_cloud_config
 terraform init
-terraform plan -var-file=inputs_basic_config.tfvars.ignore
+terraform plan -var-file=inputs.tfvars
 ```
 
 ## How changes deploy
 
 - Root-module variables have **no tfvars in the repo**. Values per environment live in `terraform_cloud_config` and are pushed into TFC workspaces as variables (`FASTLY_API_KEY` as an env var).
-- Workspaces: `web_blog_feature`, `web_blog_dev`, `web_blog_staging`, `web_blog_production`, each VCS-bound to a git branch.
+- **Do not apply `terraform_cloud_config/` as-is.** The workspaces were changed in the UI (GitHub App VCS connection, staging `auto_apply_run_trigger`) and the code was never updated, so an apply reverts them to the old OAuth token. Rotate workspace secrets in the UI and mirror them in `inputs.tfvars`.
+- Workspaces: `web_blog_dev`, `web_blog_staging`, `web_blog_production` are VCS-bound to the matching git branch; `web_blog_feature` is CLI-driven (see README for Remote vs Local execution).
 - Promotion is by PR: feature branch → `dev` → `staging` → `production` → `main`. `dev` and `staging` auto-apply; production applies manually.
 - Local root-module runs use the gitignored `backend_local.tf`, a `cloud {}` block pointed at `web_blog_feature`. Without it, `terraform init` silently uses local state.
 
@@ -47,4 +48,4 @@ terraform plan -var-file=inputs_basic_config.tfvars.ignore
 
 - Update `version_comment` in `main.tf` to describe the change. It becomes the Fastly service version note, the only rollback map.
 - Add a `CHANGELOG.md` entry per feature.
-- Secrets live in `*.tfvars.ignore` files (gitignored). Never stage them.
+- Secrets live in gitignored tfvars: `terraform_cloud_config/inputs.tfvars` (all environments) and root `inputs.tfvars` (FEATURE, for Local execution mode). Never stage them.

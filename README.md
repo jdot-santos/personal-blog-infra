@@ -99,15 +99,6 @@ To check for drift without changing anything: open a workspace â†’ **New run** â
 
 ---
 
-## TODO
-
-- [ ] **Rotate the Fastly API key.** Generate a new token in the Fastly console, update the
-      `FASTLY_API_KEY` environment variable in all four Terraform Cloud workspaces
-      (`web_blog_feature`, `web_blog_dev`, `web_blog_staging`, `web_blog_production`),
-      then revoke the old token. Also update any local `*.tfvars.ignore` file.
-
----
-
 ## License
 
 MIT License. See [LICENSE](./LICENSE) for details.
