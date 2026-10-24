@@ -18,3 +18,9 @@ All notable changes to this project will be documented in this file.
 ## [1.0.0] - 2025-04-07
 ### Added
 - Add logging
+
+## [1.1.0] - 2026-10-23
+### Added
+- Offline test suite: falco VCL tests, `terraform test` with mocked Fastly provider, CI steps, FEATURE smoke script
+### Fixed
+- add-www redirect always uses `https://` (was `req.protocol`, missing `+`)

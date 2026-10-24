@@ -64,7 +64,7 @@ terraform apply -var-file=inputs.tfvars
 
 Notes:
 
-- `terraform validate` does not check VCL. Fastly only compiles `vcl/main.vcl` on apply, so apply to FEATURE to prove a VCL change, then check it with `curl -I https://jsantosc-feature.global.ssl.fastly.net/<path>`.
+- `terraform validate` does not check VCL. Fastly only compiles `vcl/main.vcl` on apply, so apply to FEATURE to prove a VCL change, then run the smoke test (see [Testing](#testing)).
 - A run started from the Terraform Cloud UI reuses the last code uploaded by a CLI `apply`, not by a CLI `plan`. Run `terraform apply` from the CLI to refresh it before using UI runs.
 - Switch Execution Mode back to **Remote** when you're done.
 
@@ -93,10 +93,32 @@ To check for drift without changing anything: open a workspace → **New run** �
 └── README.md                # Documentation
 ```
 
+## Testing
+
+| Layer | Command | Needs network |
+|---|---|---|
+| VCL unit tests (`vcl/tests/*.test.vcl`) | `falco test -I vcl/tests vcl/main.vcl` | no |
+| VCL lint | `falco lint vcl/main.vcl` | no |
+| Terraform unit tests (`tests/*.tftest.hcl`, Fastly provider mocked) | `terraform test` | no |
+| Smoke test against a live service | `scripts/smoke.sh [base_url]` | yes |
+
+Install falco with `brew install falco`. GitHub Actions runs every offline layer on each push and PR.
+
+### Smoke test on FEATURE
+
+After `terraform apply` on `web_blog_feature`:
+
+```bash
+scripts/smoke.sh                                   # defaults to https://jsantosc-feature.global.ssl.fastly.net
+scripts/smoke.sh https://www.example.com           # any other service
+```
+
+It checks `/personal-blog/` → 200, the `solution_redirects` rows → 308 with the right `Location`, and `/test-block` → 403. Exit code is non-zero if any check fails.
+
 ## Development & Contribution
 
-- Format code with: `terraform fmt`
-- Validate syntax: `terraform validate`
+- Format code with: `terraform fmt -recursive`
+- Run the tests above before pushing
 - Use `terraform plan` before committing changes
 
 ---

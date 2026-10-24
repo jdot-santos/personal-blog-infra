@@ -89,7 +89,7 @@ sub vcl_fetch {
   }
 
   # If no TTL has been provided in the response headers, set a default
-  if (!beresp.http.Expires && !beresp.http.Surrogate-Control ~ "max-age" && !beresp.http.Cache-Control ~ "(?:s-maxage|max-age)") {
+  if (!beresp.http.Expires && !(beresp.http.Surrogate-Control ~ "max-age") && !(beresp.http.Cache-Control ~ "(?:s-maxage|max-age)")) {
     set beresp.ttl = 3600s;
 
     # Apply a longer default TTL for images processed using Image Optimizer
@@ -109,7 +109,7 @@ sub vcl_error {
     if (obj.status == 600 && obj.response == "add_www") {
       set obj.status = 308; # Or use 307 for temporary
       set obj.response = "Permanent redirect";
-      set obj.http.Location = req.protocol + "://" req.http.host + req.url;
+      set obj.http.Location = "https://" + req.http.host + req.url;
       synthetic {""};
       return (deliver);
     }
