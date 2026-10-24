@@ -1,6 +1,6 @@
 resource "fastly_service_vcl" "service" {
   name            = var.service_vcl.name
-  version_comment = "Add logic to block based on path"
+  version_comment = "Add-www redirect always uses https; explicit TTL condition precedence"
   comment         = var.service_vcl.comment
   force_destroy   = var.service_vcl.force_destroy
   stale_if_error  = var.service_vcl.stale_if_error

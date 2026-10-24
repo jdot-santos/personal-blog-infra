@@ -1,6 +1,6 @@
 name: 'Terraform'
 
-on: push
+on: [push, pull_request]
 
 env:
   TF_LOG: INFO
@@ -34,7 +34,7 @@ jobs:
       # Run a terraform fmt for push
       - name: Terraform Format
         id: fmt
-        run: terraform fmt -check
+        run: terraform fmt -check -recursive
 
       # Run a terraform validate
       # Run even if formatting fails
@@ -42,3 +42,19 @@ jobs:
         id: validate
         if: (success() || failure())
         run: terraform validate
+
+      - name: Terraform Test
+        if: (success() || failure())
+        run: terraform test
+
+      - name: Install falco
+        if: (success() || failure())
+        run: curl -sSL https://github.com/ysugimoto/falco/releases/download/v2.3.0/falco-linux-amd64.tar.gz | sudo tar xz -C /usr/local/bin
+
+      - name: VCL Lint
+        if: (success() || failure())
+        run: falco lint vcl/main.vcl
+
+      - name: VCL Test
+        if: (success() || failure())
+        run: falco test -I vcl/tests vcl/main.vcl
